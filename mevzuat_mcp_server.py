@@ -58,6 +58,34 @@ app = FastMCP(
 # Mistral API key will be loaded from environment variable MISTRAL_API_KEY
 mevzuat_client = MevzuatApiClientNew(cache_ttl=3600, enable_cache=True)
 
+# Tertip fallback order: try requested tertip first, then alternatives
+TERTIP_FALLBACK_ORDER = ["5", "3"]
+
+
+async def _get_content_with_tertip_fallback(
+    mevzuat_no: str,
+    mevzuat_tur: int,
+    mevzuat_tertip: str = "5",
+    resmi_gazete_tarihi: Optional[str] = None,
+) -> MevzuatArticleContent:
+    """Try to get content with the given tertip, falling back to alternatives if empty."""
+    tertips_to_try = [mevzuat_tertip] + [t for t in TERTIP_FALLBACK_ORDER if t != mevzuat_tertip]
+
+    for tertip in tertips_to_try:
+        result = await mevzuat_client.get_content(
+            mevzuat_no=mevzuat_no,
+            mevzuat_tur=mevzuat_tur,
+            mevzuat_tertip=tertip,
+            resmi_gazete_tarihi=resmi_gazete_tarihi,
+        )
+        if result.markdown_content and not result.error_message:
+            if tertip != mevzuat_tertip:
+                logger.info(f"Tertip fallback: {mevzuat_no} found with tertip {tertip} (requested {mevzuat_tertip})")
+            return result
+
+    # Return last result (with error) if all failed
+    return result
+
 
 # ============================================================================
 # Shared semantic search helper
@@ -73,8 +101,8 @@ async def _semantic_search_within(
     resmi_gazete_tarihi: Optional[str] = None,
 ) -> str:
     """Shared helper for semantic search within any legislation type."""
-    # 1. Get content (already cached by mevzuat_client)
-    content_result = await mevzuat_client.get_content(
+    # 1. Get content with tertip fallback (already cached by mevzuat_client)
+    content_result = await _get_content_with_tertip_fallback(
         mevzuat_no=mevzuat_no,
         mevzuat_tur=mevzuat_tur,
         mevzuat_tertip=mevzuat_tertip,
@@ -367,7 +395,7 @@ async def search_within_kanun(
             )
 
         # Keyword search
-        content_result = await mevzuat_client.get_content(
+        content_result = await _get_content_with_tertip_fallback(
             mevzuat_no=mevzuat_no, mevzuat_tur=1, mevzuat_tertip=mevzuat_tertip
         )
         if content_result.error_message:
