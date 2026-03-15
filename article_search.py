@@ -33,12 +33,13 @@ def split_into_articles(markdown_content: str) -> List[Dict[str, str]]:
     """
     articles = []
 
-    # Split by article headers: **MADDE X –** or **MADDE X**- or **Madde X –**
-    # Regex to match all formats (case-insensitive for MADDE/Madde):
-    # - **MADDE 1 –** (dash inside **) - used in some laws
-    # - **MADDE 1**- (dash outside **) - used in regulations
-    # - **Madde 1 –** (title case) - used in some laws like CMK
-    pattern = r'\*\*(?:MADDE|Madde)\s+(\d+(?:/[A-Z])?)(?:\s*[–-])?\*\*\s*-?'
+    # Split by article headers - supports multiple formats:
+    # - **MADDE 1 –** / **Madde 1 –** (standard/title case bold)
+    # - MADDE 1 – (without bold markers, older laws)
+    # - **EK MADDE 8** / **Ek Madde 8** (supplementary articles)
+    # - **GEÇİCİ MADDE 3** / **Geçici Madde 3** (temporary articles)
+    # - **MÜKERRER MADDE 5** (duplicate articles)
+    pattern = r'(?:^|\n)\s*\*{0,2}(?:(?:(EK|Ek|GEÇİCİ|Geçici|MÜKERRER|Mükerrer)\s+)?(?:MADDE|Madde)\s+(\d+))'
 
     # Find all article positions
     matches = list(re.finditer(pattern, markdown_content))
@@ -47,7 +48,17 @@ def split_into_articles(markdown_content: str) -> List[Dict[str, str]]:
         return []
 
     for i, match in enumerate(matches):
-        madde_no = match.group(1)
+        prefix = match.group(1)
+        number = match.group(2)
+        if prefix:
+            prefix_normalized = prefix.capitalize()
+            if prefix.upper() == "GEÇİCİ":
+                prefix_normalized = "Geçici"
+            elif prefix.upper() == "MÜKERRER":
+                prefix_normalized = "Mükerrer"
+            madde_no = f"{prefix_normalized} {number}"
+        else:
+            madde_no = number
         start_pos = match.start()
 
         # Find end position (start of next article or end of content)
