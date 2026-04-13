@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python files and requirements
-COPY pyproject.toml setup.py README.md ./
+COPY pyproject.toml setup.py ./
 COPY *.py ./
 COPY requirements.txt ./
 COPY semantic_search/ ./semantic_search/
