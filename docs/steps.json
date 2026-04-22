@@ -1,0 +1,226 @@
+{
+  "entry_points": [
+    "CLI (console script `mevzuat-mcp` -> `mevzuat_mcp_server.main`)",
+    "HTTP/ASGI (`uvicorn app:app`) with MCP endpoint at `/mcp/`",
+    "MCP protocol (FastMCP streamable HTTP transport)"
+  ],
+  "tool_mapping": {
+    "title/content search on mevzuat.gov.tr by legislation type": "search_kanun | search_teblig | search_cbk | search_cbyonetmelik | search_cbbaskankarar | search_cbgenelge | search_khk | search_tuzuk | search_kurum_yonetmelik",
+    "fetch full content from mevzuat.gov.tr": "get_teblig_content | get_cbbaskankarar_content | get_cbgenelge_content",
+    "search within a specific mevzuat.gov.tr document": "search_within_kanun | search_within_teblig | search_within_cbk | search_within_cbyonetmelik | search_within_cbbaskankarar | search_within_cbgenelge | search_within_khk | search_within_tuzuk | search_within_kurum_yonetmelik",
+    "unified search/browse across all types (bedesten)": "search_mevzuat",
+    "full content by mevzuatId (bedesten)": "get_mevzuat_content",
+    "keyword search within a bedesten document": "search_within_mevzuat",
+    "law rationale": "get_mevzuat_gerekce",
+    "table of contents / madde tree": "get_mevzuat_madde_tree"
+  },
+  "flows": {
+    "server_initialization_flow": [
+      {
+        "step": 1,
+        "actor": "mcp_server",
+        "action": "Create FastMCP app with server metadata/instructions and initialize shared clients/caches.",
+        "input": "Module import of `mevzuat_mcp_server.py`.",
+        "output": "FastMCP `app`, `mevzuat_client`, optional semantic components, `bedesten_client` ready.",
+        "notes": "Semantic components are conditionally initialized only if `OPENROUTER_API_KEY` is present."
+      },
+      {
+        "step": 2,
+        "actor": "mcp_server",
+        "action": "Register all tools using `@app.tool()` decorators.",
+        "input": "Async function definitions in `mevzuat_mcp_server.py`.",
+        "output": "26 MCP-callable tools exposed to MCP clients."
+      },
+      {
+        "step": 3,
+        "actor": "mcp_server",
+        "action": "Expose ASGI app via `mcp.http_app()` and add `/health` custom route.",
+        "input": "Import of `app.py`.",
+        "output": "HTTP app serving `/mcp/` (MCP) and `/health`."
+      }
+    ],
+    "mevzuat_search_flow": [
+      {
+        "step": 1,
+        "actor": "user",
+        "action": "Sends a search request (example: `search_kanun`).",
+        "input": "Query text + filters (phrase, date range, paging).",
+        "output": "MCP tool invocation intent."
+      },
+      {
+        "step": 2,
+        "actor": "client",
+        "action": "Sends MCP tool call over `/mcp/` streamable HTTP.",
+        "input": "Tool name + JSON args.",
+        "output": "Request reaches FastMCP dispatcher."
+      },
+      {
+        "step": 3,
+        "actor": "mcp_server",
+        "action": "FastMCP validates args from function signature/Pydantic `Field` constraints and executes tool coroutine.",
+        "input": "Typed tool params.",
+        "output": "Validated Python args for tool function."
+      },
+      {
+        "step": 4,
+        "actor": "tool",
+        "action": "Tool builds `MevzuatSearchRequestNew` and calls `mevzuat_client.search_documents`.",
+        "input": "Normalized search payload fields.",
+        "output": "Client call to mevzuat.gov.tr DataTables API."
+      },
+      {
+        "step": 5,
+        "actor": "external_api",
+        "action": "Client first ensures anti-forgery token/cookies via Playwright page visit, then posts JSON search payload with cookies.",
+        "input": "POST `/Anasayfa/MevzuatDatatable` payload.",
+        "output": "JSON records (`recordsTotal`, `data`)."
+      },
+      {
+        "step": 6,
+        "actor": "tool",
+        "action": "Map response rows to `MevzuatDocumentNew` list and wrap into `MevzuatSearchResultNew` (or error result).",
+        "input": "Remote JSON response.",
+        "output": "Structured model response."
+      },
+      {
+        "step": 7,
+        "actor": "mcp_server",
+        "action": "Return model as MCP tool result.",
+        "input": "Tool return object.",
+        "output": "Structured MCP response for client/LLM."
+      }
+    ],
+    "mevzuat_content_and_within_flow": [
+      {
+        "step": 1,
+        "actor": "user",
+        "action": "Calls a `search_within_*` or `get_*_content` tool with legislation identifiers.",
+        "input": "mevzuat_no (+ tertip, optional resmi_gazete_tarihi, keyword/semantic flags).",
+        "output": "Tool invocation."
+      },
+      {
+        "step": 2,
+        "actor": "tool",
+        "action": "Fetches full text via `_get_content_with_tertip_fallback` -> `mevzuat_client.get_content`.",
+        "input": "Requested tertip and fallback order (`5`, then `3`).",
+        "output": "Markdown content or error."
+      },
+      {
+        "step": 3,
+        "actor": "external_api",
+        "action": "Content pipeline branch A: HTML iframe scrape with Playwright -> HTML cleanup -> Markdown conversion.",
+        "input": "Iframe URL with mevzuat parameters.",
+        "output": "Markdown text (if successful)."
+      },
+      {
+        "step": 4,
+        "actor": "external_api",
+        "action": "Content pipeline branch B fallback: DOC/PDF download; for CB Kararı/CB Genelgesi use PDF path (optionally Mistral OCR, else markitdown).",
+        "input": "Constructed DOC/PDF URLs and session cookies when needed.",
+        "output": "Markdown text fallback or error."
+      },
+      {
+        "step": 5,
+        "actor": "tool",
+        "action": "Within-search branch decision: `semantic=false` -> keyword search; `semantic=true` -> embedding-based semantic search.",
+        "input": "keyword, case_sensitive, max_results, semantic flag.",
+        "output": "Formatted text result list."
+      },
+      {
+        "step": 6,
+        "actor": "tool",
+        "action": "Keyword mode: split into articles/chunks and evaluate query operators (`AND/OR/NOT`, phrases), rank by score.",
+        "input": "Markdown content + query.",
+        "output": "Formatted matching MADDE/chunk blocks."
+      },
+      {
+        "step": 7,
+        "actor": "external_api",
+        "action": "Semantic mode: OpenRouter embeddings API call for docs/query (if API key configured), then in-memory vector similarity search.",
+        "input": "Chunked text/title batches + query.",
+        "output": "Top-k similarity results above threshold."
+      },
+      {
+        "step": 8,
+        "actor": "mcp_server",
+        "action": "Returns final string payload through MCP.",
+        "input": "Formatted result/error string.",
+        "output": "Client-visible answer."
+      }
+    ],
+    "bedesten_search_and_detail_flow": [
+      {
+        "step": 1,
+        "actor": "user",
+        "action": "Calls `search_mevzuat` (search or browse).",
+        "input": "phrase/mevzuat_adi/mevzuat_no/mevzuat_tur/date filters/page options.",
+        "output": "Tool invocation."
+      },
+      {
+        "step": 2,
+        "actor": "tool",
+        "action": "Normalizes type filters, auto-expands browse mode to all types when no query provided.",
+        "input": "Raw tool args.",
+        "output": "Prepared query for Bedesten client."
+      },
+      {
+        "step": 3,
+        "actor": "tool",
+        "action": "Calls `bedesten_client.search_documents`.",
+        "input": "Filters + sorting + paging.",
+        "output": "HTTP POST request payload wrapped as `{data, applicationName, paging}`."
+      },
+      {
+        "step": 4,
+        "actor": "external_api",
+        "action": "Bedesten `/searchDocuments` returns wrapped response with metadata status.",
+        "input": "Search payload.",
+        "output": "Result list (`mevzuatList`, total/start) or error metadata."
+      },
+      {
+        "step": 5,
+        "actor": "tool",
+        "action": "Map documents to models and format concise list lines including `mevzuatId`/`gerekceId`.",
+        "input": "BedSearchResult.",
+        "output": "Human-readable result text."
+      },
+      {
+        "step": 6,
+        "actor": "user",
+        "action": "Calls detail tools using IDs from search results.",
+        "input": "mevzuatId or gerekceId.",
+        "output": "Detail invocation."
+      },
+      {
+        "step": 7,
+        "actor": "tool",
+        "action": "Detail branches: `get_mevzuat_content` -> `get_document_plain_text`; `search_within_mevzuat` -> plain text article split + keyword scoring; `get_mevzuat_gerekce` -> decode/strip HTML; `get_mevzuat_madde_tree` -> fetch tree + format hierarchy.",
+        "input": "ID(s) from prior search output.",
+        "output": "Formatted plain text results."
+      },
+      {
+        "step": 8,
+        "actor": "mcp_server",
+        "action": "Returns tool output via MCP transport.",
+        "input": "String response.",
+        "output": "Structured MCP tool result to client."
+      }
+    ],
+    "error_and_cache_branches": [
+      {
+        "step": 1,
+        "actor": "tool",
+        "action": "If upstream call fails, catch exception and return tool-level error string/model instead of raising.",
+        "input": "Exceptions or non-success API metadata.",
+        "output": "Graceful error payload."
+      },
+      {
+        "step": 2,
+        "actor": "tool",
+        "action": "Use in-memory TTL cache for content/search artifacts (mevzuat markdown cache, bedesten cache, embedding cache).",
+        "input": "Cache keys by mevzuat identifiers/content hash.",
+        "output": "Reduced repeated network/embedding work."
+      }
+    ]
+  }
+}
