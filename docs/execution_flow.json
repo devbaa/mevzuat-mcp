@@ -1,0 +1,39 @@
+{
+  "entry_points": [
+    "MCP protocol over Streamable HTTP (/mcp/) via ASGI app",
+    "CLI (python -m / console script mevzuat-mcp -> mevzuat_mcp_server.main)",
+    "ASGI health check endpoint (/health)"
+  ],
+  "tool_groups": {
+    "mevzuat_gov_tr_tools": [
+      "search_kanun",
+      "search_within_kanun",
+      "search_teblig",
+      "get_teblig_content",
+      "search_cbk",
+      "search_within_cbk",
+      "search_cbyonetmelik",
+      "search_within_cbyonetmelik",
+      "search_cbbaskankarar",
+      "get_cbbaskankarar_content",
+      "search_cbgenelge",
+      "get_cbgenelge_content",
+      "search_khk",
+      "search_within_khk",
+      "search_tuzuk",
+      "search_within_tuzuk",
+      "search_kurum_yonetmelik",
+      "search_within_kurum_yonetmelik",
+      "search_within_teblig",
+      "search_within_cbbaskankarar",
+      "search_within_cbgenelge"
+    ],
+    "bedesten_tools": [
+      "search_mevzuat",
+      "get_mevzuat_content",
+      "search_within_mevzuat",
+      "get_mevzuat_gerekce",
+      "get_mevzuat_madde_tree"
+    ]
+  }
+}
