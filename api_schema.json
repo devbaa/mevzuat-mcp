@@ -1,0 +1,395 @@
+{
+  "services": [
+    {
+      "name": "search_kanun",
+      "description": "Search legislation documents of type Kanun.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Keyword or boolean query." },
+          "filters": {
+            "type": "object",
+            "description": "Optional filters.",
+            "properties": {
+              "tam_cumle": { "type": "boolean" },
+              "baslangic_tarihi": { "type": "string" },
+              "bitis_tarihi": { "type": "string" },
+              "page_number": { "type": "integer" },
+              "aranacak_yer": { "type": "integer" },
+              "page_size": { "type": "integer" }
+            }
+          }
+        },
+        "required": ["query"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "description": "Composite identifier from mevzuat_no + mevzuat_tur + mevzuat_tertip." },
+                "number": { "type": "string" },
+                "title": { "type": "string" },
+                "acceptance_date": { "type": "string" },
+                "official_gazette_date": { "type": "string" },
+                "official_gazette_issue": { "type": "string" },
+                "type_code": { "type": "integer" },
+                "tertip": { "type": "string" },
+                "url": { "type": "string" }
+              }
+            }
+          },
+          "total_results": { "type": "integer" },
+          "current_page": { "type": "integer" },
+          "page_size": { "type": "integer" },
+          "total_pages": { "type": "integer" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "search_teblig",
+      "description": "Search legislation documents of type Tebliğ.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "tam_cumle": { "type": "boolean" },
+              "baslangic_tarihi": { "type": "string" },
+              "bitis_tarihi": { "type": "string" },
+              "page_number": { "type": "integer" },
+              "aranacak_yer": { "type": "integer" },
+              "page_size": { "type": "integer" }
+            }
+          }
+        },
+        "required": ["query"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": { "$ref": "#/services/0/output_schema/properties/results" },
+          "total_results": { "type": "integer" },
+          "current_page": { "type": "integer" },
+          "page_size": { "type": "integer" },
+          "total_pages": { "type": "integer" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "search_cbk",
+      "description": "Search legislation documents of type Cumhurbaşkanlığı Kararnamesi.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "tam_cumle": { "type": "boolean" },
+              "baslangic_tarihi": { "type": "string" },
+              "bitis_tarihi": { "type": "string" },
+              "page_number": { "type": "integer" },
+              "aranacak_yer": { "type": "integer" },
+              "page_size": { "type": "integer" }
+            }
+          }
+        },
+        "required": ["query"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": { "$ref": "#/services/0/output_schema/properties/results" },
+          "total_results": { "type": "integer" },
+          "current_page": { "type": "integer" },
+          "page_size": { "type": "integer" },
+          "total_pages": { "type": "integer" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "search_cbyonetmelik",
+      "description": "Search legislation documents of type CB Yönetmeliği.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "tam_cumle": { "type": "boolean" },
+              "baslangic_tarihi": { "type": "string" },
+              "bitis_tarihi": { "type": "string" },
+              "page_number": { "type": "integer" },
+              "aranacak_yer": { "type": "integer" },
+              "page_size": { "type": "integer" }
+            }
+          }
+        },
+        "required": []
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": { "$ref": "#/services/0/output_schema/properties/results" },
+          "total_results": { "type": "integer" },
+          "current_page": { "type": "integer" },
+          "page_size": { "type": "integer" },
+          "total_pages": { "type": "integer" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "search_cbbaskankarar",
+      "description": "Search legislation documents of type Cumhurbaşkanı Kararı.",
+      "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object" } }, "required": [] },
+      "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/0/output_schema/properties/results" }, "total_results": { "type": "integer" }, "current_page": { "type": "integer" }, "page_size": { "type": "integer" }, "total_pages": { "type": "integer" }, "error_message": { "type": "string" } } }
+    },
+    {
+      "name": "search_cbgenelge",
+      "description": "Search legislation documents of type CB Genelgesi.",
+      "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object" } }, "required": [] },
+      "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/0/output_schema/properties/results" }, "total_results": { "type": "integer" }, "current_page": { "type": "integer" }, "page_size": { "type": "integer" }, "total_pages": { "type": "integer" }, "error_message": { "type": "string" } } }
+    },
+    {
+      "name": "search_khk",
+      "description": "Search legislation documents of type KHK.",
+      "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object" } }, "required": [] },
+      "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/0/output_schema/properties/results" }, "total_results": { "type": "integer" }, "current_page": { "type": "integer" }, "page_size": { "type": "integer" }, "total_pages": { "type": "integer" }, "error_message": { "type": "string" } } }
+    },
+    {
+      "name": "search_tuzuk",
+      "description": "Search legislation documents of type Tüzük.",
+      "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object" } }, "required": [] },
+      "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/0/output_schema/properties/results" }, "total_results": { "type": "integer" }, "current_page": { "type": "integer" }, "page_size": { "type": "integer" }, "total_pages": { "type": "integer" }, "error_message": { "type": "string" } } }
+    },
+    {
+      "name": "search_kurum_yonetmelik",
+      "description": "Search legislation documents of type Kurum Yönetmeliği.",
+      "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object" } }, "required": [] },
+      "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/0/output_schema/properties/results" }, "total_results": { "type": "integer" }, "current_page": { "type": "integer" }, "page_size": { "type": "integer" }, "total_pages": { "type": "integer" }, "error_message": { "type": "string" } } }
+    },
+
+    {
+      "name": "search_within_kanun",
+      "description": "Search within a specific Kanun document.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Search expression inside the selected document." },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "mevzuat_no": { "type": "string" },
+              "mevzuat_tertip": { "type": "string" },
+              "case_sensitive": { "type": "boolean" },
+              "max_results": { "type": "integer" },
+              "semantic": { "type": "boolean" }
+            }
+          }
+        },
+        "required": ["query"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "description": "Article/chunk identifier." },
+                "title": { "type": "string" },
+                "content": { "type": "string" },
+                "match_count": { "type": "integer" },
+                "score": { "type": "number" },
+                "preview": { "type": "string" }
+              }
+            }
+          },
+          "total_matches": { "type": "integer" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    { "name": "search_within_cbk", "description": "Search within a specific Cumhurbaşkanlığı Kararnamesi document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+    { "name": "search_within_cbyonetmelik", "description": "Search within a specific CB Yönetmeliği document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+    { "name": "search_within_khk", "description": "Search within a specific KHK document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+    { "name": "search_within_tuzuk", "description": "Search within a specific Tüzük document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+    { "name": "search_within_kurum_yonetmelik", "description": "Search within a specific Kurum Yönetmeliği document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+    { "name": "search_within_teblig", "description": "Search within a specific Tebliğ document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+    { "name": "search_within_cbbaskankarar", "description": "Search within a specific Cumhurbaşkanı Kararı document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+    { "name": "search_within_cbgenelge", "description": "Search within a specific CB Genelgesi document.", "input_schema": { "type": "object", "properties": { "query": { "type": "string" }, "filters": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "resmi_gazete_tarihi": { "type": "string" }, "mevzuat_tertip": { "type": "string" }, "case_sensitive": { "type": "boolean" }, "max_results": { "type": "integer" }, "semantic": { "type": "boolean" } } } }, "required": ["query"] }, "output_schema": { "type": "object", "properties": { "results": { "$ref": "#/services/9/output_schema/properties/results" }, "total_matches": { "type": "integer" }, "error_message": { "type": "string" } } } },
+
+    {
+      "name": "search_mevzuat",
+      "description": "Unified search/list endpoint over bedesten.adalet.gov.tr legislation data.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Primary full-text query (phrase)." },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "mevzuat_adi": { "type": "string" },
+              "mevzuat_no": { "type": "string" },
+              "mevzuat_tur": { "type": "string" },
+              "basliktaAra": { "type": "boolean" },
+              "tamCumle": { "type": "boolean" },
+              "resmi_gazete_tarihi_start": { "type": "string" },
+              "resmi_gazete_tarihi_end": { "type": "string" },
+              "resmi_gazete_sayisi": { "type": "string" },
+              "page": { "type": "integer" },
+              "page_size": { "type": "integer" }
+            }
+          }
+        },
+        "required": []
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "description": "mevzuatId" },
+                "number": { "type": "string" },
+                "title": { "type": "string" },
+                "type": { "type": "string" },
+                "official_gazette_date": { "type": "string" },
+                "gerekce_id": { "type": "string" }
+              }
+            }
+          },
+          "total_results": { "type": "integer" },
+          "page": { "type": "integer" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "search_within_mevzuat",
+      "description": "Search within a bedesten legislation document by mevzuat_id.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Keyword/boolean expression for article search." },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "mevzuat_id": { "type": "string" },
+              "case_sensitive": { "type": "boolean" },
+              "max_results": { "type": "integer" }
+            }
+          }
+        },
+        "required": ["query"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "results": { "$ref": "#/services/9/output_schema/properties/results" },
+          "total_matches": { "type": "integer" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+
+    {
+      "name": "get_teblig_content",
+      "description": "Get full content for a Tebliğ document.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mevzuat_no": { "type": "string" },
+          "mevzuat_tertip": { "type": "string" }
+        },
+        "required": ["mevzuat_no"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "get_cbbaskankarar_content",
+      "description": "Get full content for a Cumhurbaşkanı Kararı document.",
+      "input_schema": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "mevzuat_tertip": { "type": "string" } }, "required": ["mevzuat_no"] },
+      "output_schema": { "type": "object", "properties": { "id": { "type": "string" }, "title": { "type": "string" }, "content": { "type": "string" }, "error_message": { "type": "string" } } }
+    },
+    {
+      "name": "get_cbgenelge_content",
+      "description": "Get full content for a CB Genelgesi document.",
+      "input_schema": { "type": "object", "properties": { "mevzuat_no": { "type": "string" }, "resmi_gazete_tarihi": { "type": "string" }, "mevzuat_tertip": { "type": "string" } }, "required": ["mevzuat_no", "resmi_gazete_tarihi"] },
+      "output_schema": { "type": "object", "properties": { "id": { "type": "string" }, "title": { "type": "string" }, "content": { "type": "string" }, "error_message": { "type": "string" } } }
+    },
+    {
+      "name": "get_mevzuat_content",
+      "description": "Get full content for a bedesten legislation document.",
+      "input_schema": { "type": "object", "properties": { "mevzuat_id": { "type": "string" } }, "required": ["mevzuat_id"] },
+      "output_schema": { "type": "object", "properties": { "id": { "type": "string" }, "title": { "type": "string" }, "content": { "type": "string" }, "error_message": { "type": "string" } } }
+    },
+    {
+      "name": "get_mevzuat_gerekce",
+      "description": "Get full rationale (gerekçe) text.",
+      "input_schema": { "type": "object", "properties": { "gerekce_id": { "type": "string" } }, "required": ["gerekce_id"] },
+      "output_schema": { "type": "object", "properties": { "id": { "type": "string" }, "title": { "type": "string" }, "content": { "type": "string" }, "error_message": { "type": "string" } } }
+    },
+
+    {
+      "name": "get_mevzuat_madde_tree",
+      "description": "Get article tree for a bedesten legislation document.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "mevzuat_id": { "type": "string" }
+        },
+        "required": ["mevzuat_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "parent_id": { "type": "string" },
+                "label": { "type": "string" },
+                "type": { "type": "string" },
+                "gerekce_id": { "type": "string" }
+              }
+            }
+          },
+          "error_message": { "type": "string" }
+        }
+      }
+    }
+  ],
+  "meta": {
+    "base_url": {
+      "mevzuat": "https://www.mevzuat.gov.tr",
+      "bedesten": "https://bedesten.adalet.gov.tr/mevzuat"
+    },
+    "auth": "No explicit API auth configured in server code; optional OPENROUTER_API_KEY enables semantic search and optional MISTRAL_API_KEY enables OCR fallback.",
+    "notes": "Schemas are normalized abstractions from FastMCP tools and return models; string-formatted outputs were converted into structured API shapes."
+  }
+}
