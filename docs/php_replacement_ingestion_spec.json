@@ -1,0 +1,149 @@
+{
+  "repo_summary": {
+    "primary_server": "FastMCP app exposes 26 tools across mevzuat.gov.tr and bedesten.adalet.gov.tr",
+    "core_files": [
+      "mevzuat_mcp_server.py",
+      "mevzuat_client.py",
+      "bedesten_client.py",
+      "article_search.py",
+      "semantic_search/*"
+    ],
+    "observed_data_paths": [
+      "search/list over mevzuat.gov.tr DataTables API",
+      "full-content fetch via HTML iframe, DOC, PDF (+ OCR)",
+      "bedesten REST search/content/gerekce/tree",
+      "search-within workflows loading full content then article/chunk parsing"
+    ],
+    "important_branching": {
+      "tertip_fallback": ["requested tertip", "5", "3"],
+      "content_transport_order": ["HTML iframe first", "DOC", "PDF", "OCR fallback for PDF when configured"],
+      "semantic_branch": "search_within_* chooses semantic vector path vs keyword path",
+      "cache_branch": "in-memory content cache and embedding cache short-circuit remote calls"
+    }
+  },
+  "sources": [
+    {"name":"search_kanun","category":"search","code_location":"mevzuat_mcp_server.py:251","purpose":"Search laws","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_kanun"},
+    {"name":"search_within_kanun","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:348","purpose":"Keyword/semantic search in law content","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=1"],"recommended_db_source_flag":"mcp.search_within_kanun"},
+    {"name":"search_teblig","category":"search","code_location":"mevzuat_mcp_server.py:422","purpose":"Search communiques","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_teblig"},
+    {"name":"get_teblig_content","category":"content","code_location":"mevzuat_mcp_server.py:510","purpose":"Fetch full communique text","input_params":["mevzuat_no","mevzuat_tertip"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=9"],"recommended_db_source_flag":"mcp.get_teblig_content"},
+    {"name":"search_cbk","category":"search","code_location":"mevzuat_mcp_server.py:559","purpose":"Search presidential decrees","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_cbk"},
+    {"name":"search_within_cbk","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:646","purpose":"Search within CBK","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=19"],"recommended_db_source_flag":"mcp.search_within_cbk"},
+    {"name":"search_cbyonetmelik","category":"search","code_location":"mevzuat_mcp_server.py:719","purpose":"Search CB regulations","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_cbyonetmelik"},
+    {"name":"search_within_cbyonetmelik","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:804","purpose":"Search within CB regulations","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=21"],"recommended_db_source_flag":"mcp.search_within_cbyonetmelik"},
+    {"name":"search_cbbaskankarar","category":"search","code_location":"mevzuat_mcp_server.py:880","purpose":"Search presidential decisions","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_cbbaskankarar"},
+    {"name":"get_cbbaskankarar_content","category":"content","code_location":"mevzuat_mcp_server.py:969","purpose":"Fetch full presidential decision","input_params":["mevzuat_no","mevzuat_tertip"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=20"],"recommended_db_source_flag":"mcp.get_cbbaskankarar_content"},
+    {"name":"search_cbgenelge","category":"search","code_location":"mevzuat_mcp_server.py:1019","purpose":"Search presidential circulars","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_cbgenelge"},
+    {"name":"get_cbgenelge_content","category":"content","code_location":"mevzuat_mcp_server.py:1101","purpose":"Fetch full circular","input_params":["mevzuat_no","resmi_gazete_tarihi","mevzuat_tertip"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","resmi_gazete_tarihi","mevzuat_tur=22"],"recommended_db_source_flag":"mcp.get_cbgenelge_content"},
+    {"name":"search_khk","category":"search","code_location":"mevzuat_mcp_server.py:1163","purpose":"Search decree laws","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_khk"},
+    {"name":"search_within_khk","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:1247","purpose":"Search within decree laws","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=4"],"recommended_db_source_flag":"mcp.search_within_khk"},
+    {"name":"search_tuzuk","category":"search","code_location":"mevzuat_mcp_server.py:1324","purpose":"Search statutes","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_tuzuk"},
+    {"name":"search_within_tuzuk","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:1407","purpose":"Search within statutes","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=2"],"recommended_db_source_flag":"mcp.search_within_tuzuk"},
+    {"name":"search_kurum_yonetmelik","category":"search","code_location":"mevzuat_mcp_server.py:1484","purpose":"Search institution regulations","input_params":["aranacak_ifade","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuatTur","mevzuatTertip","mevzuatNo"],"recommended_db_source_flag":"mcp.search_kurum_yonetmelik"},
+    {"name":"search_within_kurum_yonetmelik","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:1571","purpose":"Search within institution regulations","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=7"],"recommended_db_source_flag":"mcp.search_within_kurum_yonetmelik"},
+    {"name":"search_within_teblig","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:1648","purpose":"Search within communiques","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=9"],"recommended_db_source_flag":"mcp.search_within_teblig"},
+    {"name":"search_within_cbbaskankarar","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:1733","purpose":"Search within presidential decisions","input_params":["mevzuat_no","keyword","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tertip","mevzuat_tur=20"],"recommended_db_source_flag":"mcp.search_within_cbbaskankarar"},
+    {"name":"search_within_cbgenelge","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:1805","purpose":"Search within circulars","input_params":["mevzuat_no","keyword","resmi_gazete_tarihi","mevzuat_tertip","case_sensitive","max_results","semantic"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","resmi_gazete_tarihi","mevzuat_tertip","mevzuat_tur=22"],"recommended_db_source_flag":"mcp.search_within_cbgenelge"},
+    {"name":"search_mevzuat","category":"list","code_location":"mevzuat_mcp_server.py:1928","purpose":"Unified bedesten search/list","input_params":["phrase","mevzuat_adi","mevzuat_no","mevzuat_tur","basliktaAra","tamCumle","resmi_gazete_tarihi_start","resmi_gazete_tarihi_end","resmi_gazete_sayisi","page","page_size"],"supports_paging":true,"paging_fields":["page","page_size"],"downloads_full_document":false,"document_identity_fields":["mevzuat_id","mevzuat_no"],"recommended_db_source_flag":"mcp.search_mevzuat"},
+    {"name":"get_mevzuat_content","category":"content","code_location":"mevzuat_mcp_server.py:2114","purpose":"Get full plain text by mevzuatId","input_params":["mevzuat_id"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_id"],"recommended_db_source_flag":"mcp.get_mevzuat_content"},
+    {"name":"search_within_mevzuat","category":"detail","code_location":"mevzuat_mcp_server.py:2147","purpose":"Keyword search in plain text articles","input_params":["mevzuat_id","keyword","case_sensitive","max_results"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_id"],"recommended_db_source_flag":"mcp.search_within_mevzuat"},
+    {"name":"get_mevzuat_gerekce","category":"content","code_location":"mevzuat_mcp_server.py:2212","purpose":"Get rationale content","input_params":["gerekce_id"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["gerekce_id","mevzuat_id"],"recommended_db_source_flag":"mcp.get_mevzuat_gerekce"},
+    {"name":"get_mevzuat_madde_tree","category":"detail","code_location":"mevzuat_mcp_server.py:2253","purpose":"Get article tree/TOC","input_params":["mevzuat_id"],"supports_paging":false,"paging_fields":[],"downloads_full_document":false,"document_identity_fields":["mevzuat_id","madde_id"],"recommended_db_source_flag":"mcp.get_mevzuat_madde_tree"},
+    {"name":"_get_content_with_tertip_fallback","category":"other","code_location":"mevzuat_mcp_server.py:65","purpose":"Fallback content retrieval by tertip order","input_params":["mevzuat_no","mevzuat_tur","mevzuat_tertip","resmi_gazete_tarihi"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tur","mevzuat_tertip"],"recommended_db_source_flag":"flow.tertip_fallback"},
+    {"name":"_semantic_search_within","category":"semantic_helper","code_location":"mevzuat_mcp_server.py:94","purpose":"Semantic flow that triggers full-content download and embedding cache","input_params":["mevzuat_no","query","mevzuat_tur","mevzuat_tertip","max_results","threshold","resmi_gazete_tarihi"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tur","mevzuat_tertip"],"recommended_db_source_flag":"flow.semantic_search"},
+    {"name":"MevzuatApiClientNew.get_content","category":"content","code_location":"mevzuat_client.py:557","purpose":"Core content retrieval with HTML->DOC->PDF branch and cache","input_params":["mevzuat_no","mevzuat_tur","mevzuat_tertip","resmi_gazete_tarihi"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tur","mevzuat_tertip","resmi_gazete_tarihi"],"recommended_db_source_flag":"client.mevzuat.get_content"},
+    {"name":"MevzuatApiClientNew.search_documents","category":"search","code_location":"mevzuat_client.py:451","purpose":"Direct POST to MevzuatDatatable","input_params":["aranacak_ifade","mevzuat_tur","tam_cumle","baslangic_tarihi","bitis_tarihi","page_number","page_size"],"supports_paging":true,"paging_fields":["page_number","page_size","start","length"],"downloads_full_document":false,"document_identity_fields":["mevzuatNo","mevzuatTur","mevzuatTertip"],"recommended_db_source_flag":"client.mevzuat.search_documents"},
+    {"name":"MevzuatApiClientNew.get_content_from_html","category":"content","code_location":"mevzuat_client.py:726","purpose":"HTML iframe fetch/parse path","input_params":["mevzuat_no","mevzuat_tur","mevzuat_tertip"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_no","mevzuat_tur","mevzuat_tertip"],"recommended_db_source_flag":"client.mevzuat.get_content_from_html"},
+    {"name":"BedestenClient.search_documents","category":"list","code_location":"bedesten_client.py:131","purpose":"REST list/search endpoint /searchDocuments","input_params":["phrase","mevzuat_adi","mevzuat_no","mevzuat_tur_list","basliktaAra","tamCumle","resmi_gazete_tarihi_start","resmi_gazete_tarihi_end","resmi_gazete_sayisi","page","page_size","sort_field","sort_direction"],"supports_paging":true,"paging_fields":["page","page_size","pageNumber","pageSize"],"downloads_full_document":false,"document_identity_fields":["mevzuat_id","mevzuat_no"],"recommended_db_source_flag":"client.bedesten.search_documents"},
+    {"name":"BedestenClient.get_document_content","category":"content","code_location":"bedesten_client.py:227","purpose":"REST /getDocumentContent for full document","input_params":["mevzuat_id"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["mevzuat_id"],"recommended_db_source_flag":"client.bedesten.get_document_content"},
+    {"name":"BedestenClient.get_gerekce_content","category":"content","code_location":"bedesten_client.py:324","purpose":"REST /getGerekceContent","input_params":["gerekce_id"],"supports_paging":false,"paging_fields":[],"downloads_full_document":true,"document_identity_fields":["gerekce_id","mevzuat_id"],"recommended_db_source_flag":"client.bedesten.get_gerekce_content"},
+    {"name":"BedestenClient.get_article_tree","category":"detail","code_location":"bedesten_client.py:286","purpose":"REST /mevzuatMaddeTree","input_params":["mevzuat_id"],"supports_paging":false,"paging_fields":[],"downloads_full_document":false,"document_identity_fields":["mevzuat_id","madde_id"],"recommended_db_source_flag":"client.bedesten.get_article_tree"}
+  ],
+  "tool_to_import_job_mapping": [
+    {"tool_family":"mevzuat.gov.tr search_*","php_job":"MevzuatSearchImportJob","mode":"list","next_step":"enqueue content job per result"},
+    {"tool_family":"mevzuat.gov.tr get_*_content","php_job":"MevzuatFullContentImportJob","mode":"full_content","next_step":"upsert document + version"},
+    {"tool_family":"mevzuat.gov.tr search_within_*","php_job":"MevzuatSearchWithinAuditJob","mode":"detail/semantic","next_step":"persist retrieval lineage and matched article metadata"},
+    {"tool_family":"bedesten search_mevzuat","php_job":"BedestenSearchImportJob","mode":"list","next_step":"enqueue get_content/gerekce/tree jobs"},
+    {"tool_family":"bedesten get_mevzuat_content","php_job":"BedestenFullContentImportJob","mode":"full_content","next_step":"upsert content + hash"},
+    {"tool_family":"bedesten get_mevzuat_gerekce","php_job":"BedestenGerekceImportJob","mode":"content","next_step":"store as related document variant"},
+    {"tool_family":"bedesten get_mevzuat_madde_tree","php_job":"BedestenTreeImportJob","mode":"detail","next_step":"store tree JSON for structure and madde IDs"}
+  ],
+  "database_schema": {
+    "implemented_in": "migrations/20260422_000001_create_ingestion_tables.sql",
+    "dedupe_keys": [
+      "documents(unique source_id,document_type,tertip,no,madde_no,raw_identifier)",
+      "document_versions(unique document_id,content_hash)",
+      "fetch_requests(unique job_id,source_id,endpoint_name,page_number,cursor_value,request_fingerprint)"
+    ]
+  },
+  "php_architecture": {
+    "files": [
+      "public/downloader.php",
+      "src/SourceRegistry.php",
+      "src/Downloader/AbstractSourceDownloader.php",
+      "src/Downloader/MevzuatGovDownloader.php",
+      "src/Http/HttpClient.php",
+      "src/RateLimit/ThrottlePolicy.php",
+      "src/Repository/DocumentRepository.php",
+      "src/Repository/FetchJobRepository.php",
+      "src/Service/FetchJobRunner.php",
+      "src/Logger/ImportLogger.php",
+      "config/sources.php"
+    ],
+    "runtime": "PHP 8.2+, PDO + cURL"
+  },
+  "download_flow": [
+    "Create fetch_job and persist operator options (source, mode, filters, max pages/items, throttle profile)",
+    "Page through list endpoint; persist each request in fetch_requests with params+status+timings",
+    "Normalize identity fields from each result; enqueue detail/full-content fetch",
+    "Run full content retrieval with HTML/DOC/PDF fallback strategy and source flags",
+    "Compute SHA-256 content_hash and upsert documents",
+    "If hash changed, insert document_versions",
+    "Persist metadata/tree/gerekce in document_metadata",
+    "Persist rate_limit_events and retry attempts",
+    "Mark job finished with totals, errors, and stop reason"
+  ],
+  "rate_limit_policy": {
+    "mevzuat.gov.tr": {
+      "list_requests": {"min_delay_ms": 1200, "max_rpm": 30, "max_rph": 1200, "burst_size": 2, "jitter_ms": [150, 450], "concurrency": 1},
+      "detail_requests": {"min_delay_ms": 2000, "max_rpm": 20, "max_rph": 800, "burst_size": 1, "jitter_ms": [250, 700], "concurrency": 1},
+      "content_requests": {"min_delay_ms": 3500, "max_rpm": 12, "max_rph": 400, "burst_size": 1, "jitter_ms": [350, 1000], "concurrency": 1}
+    },
+    "bedesten.adalet.gov.tr": {
+      "list_requests": {"min_delay_ms": 900, "max_rpm": 40, "max_rph": 1600, "burst_size": 3, "jitter_ms": [100, 300], "concurrency": 1},
+      "detail_requests": {"min_delay_ms": 1500, "max_rpm": 25, "max_rph": 900, "burst_size": 1, "jitter_ms": [150, 500], "concurrency": 1},
+      "content_requests": {"min_delay_ms": 2500, "max_rpm": 15, "max_rph": 500, "burst_size": 1, "jitter_ms": [300, 900], "concurrency": 1}
+    }
+  },
+  "pagination_policy": {
+    "search_* mevzuat.gov.tr": {"paging_supported": true, "paging_style": "page_number", "request_fields": ["page_number", "page_size"], "safe_defaults": {"page_size": 25, "max_pages_per_job": 100, "max_items_per_job": 2500}},
+    "search_mevzuat bedesten": {"paging_supported": true, "paging_style": "page_number", "request_fields": ["page", "page_size"], "safe_defaults": {"page_size": 25, "max_pages_per_job": 120, "max_items_per_job": 3000}},
+    "content/detail endpoints": {"paging_supported": false, "paging_style": "none", "request_fields": [], "safe_defaults": {"page_size": 1, "max_pages_per_job": 1, "max_items_per_job": 500}}
+  },
+  "retry_policy": {
+    "max_attempts": 5,
+    "timeouts_seconds": [30, 45, 60],
+    "backoff": {
+      "on_429_seconds": [60, 180, 600],
+      "on_403_seconds": [300, 1800],
+      "on_5xx_seconds": [10, 30, 90, 180],
+      "on_timeout_seconds": [10, 30, 90]
+    },
+    "circuit_breaker": {
+      "consecutive_failures_threshold": 12,
+      "open_state_seconds": 900
+    }
+  },
+  "example_code": {
+    "status": "added scaffold PHP classes and SQL migration in repository"
+  },
+  "risks": [
+    "Playwright-backed mevzuat flow in Python depends on browser/cookies; direct PHP replacement should use REST/search endpoints where possible and fallback to HTML fetch carefully.",
+    "PDF OCR path is expensive and higher ban-risk due to large payloads; keep low concurrency and hard caps.",
+    "Semantic search in existing MCP performs content fetch + embedding; importer should avoid triggering semantic fetch unless explicitly requested."
+  ],
+  "implementation_notes": [
+    "Values for safe defaults are conservative and inferred unless directly constrained by code comments/Field validators.",
+    "Store raw request/response envelope snapshots for replayability and auditing.",
+    "Persist source flags on each document row: source_tool, source_variant, fetch_transport, used_fallback, used_cache, semantic_related, full_download_completed."
+  ]
+}
